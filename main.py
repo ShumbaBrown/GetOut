@@ -1,30 +1,41 @@
+import random
 #copy code and run in repl.it if needed
 #keys are the rooms, values are the doors
-rooms = {
-               '1' : ['1','2', '3'],
-               '2' : ['1','2', '3'],
-               '3' : ['1', '2', '3']
-             }
+roomLayout = {}
 gameOver = False
+#initalizes floor plan and selects starting room
+def floorPlan():
+    global roomLayout
+    totalRooms = random.randint(1, 10)
+    roomLayout = {roomNum: [] for roomNum in range(1, totalRooms + 1)}
+    #populates rooms and doors
+    for key in roomLayout:
+        for value in range(totalRooms + 1):
+            roomLayout[key].append(value)
+    #starts player in random room
+    startingRoom = random.choice(list(roomLayout))
+    #ensures starting room is not the final room
+    while(startingRoom == len(roomLayout)):
+      startingRoom = random.choice(list(roomLayout))
+    print('There are ', totalRooms, 'rooms in the House. Can you escape?')
+    return startingRoom
 #returns the current Room
 def roomManager(currentRoom, doorSelected):
     global gameOver
     #sets the next room the sum of door and the current room
     nextRoom = int(currentRoom) + int(doorSelected)
+    #loops player back to the same room
+    if(int(doorSelected) == int(currentRoom)):
+      nextRoom = 0
+      return currentRoom
     #checks if the next room is the last room or the exit
-    if(nextRoom == len(rooms)):
+    elif(nextRoom == len(roomLayout)):
       gameOver = True
       currentRoom = "Escaped"
       print("You have", currentRoom)
-    #checks if the value of the door equals the room number
-    #means the next room is the current room (door leads player in a circle)
-    elif(nextRoom - int(currentRoom) == 1):
-      nextRoom = 0
-      return currentRoom
     else:
-      if (nextRoom - int(currentRoom)) > int(currentRoom):
         #checks if a door selected leads to a room not in the dictionary
-        if(int(nextRoom) > len(rooms)):
+        if(int(nextRoom) > len(roomLayout)):
           gameOver = True
           currentRoom = "Sunken Place"
           print("You have entered in the", currentRoom)
@@ -36,9 +47,9 @@ def roomManager(currentRoom, doorSelected):
           nextRoom = 0
           return currentRoom
 def main():
-  currentRoom = '1'
-  while not gameOver:
-    print("You are in currently in Room ", currentRoom)
-    doorSelected = input("What Door: ")
-    currentRoom = roomManager(currentRoom, doorSelected)
+    currentRoom = floorPlan()
+    while not gameOver:
+        print("You are in currently in Room ", currentRoom)
+        doorSelected = input("What Door: ")
+        currentRoom = roomManager(currentRoom, doorSelected)
 main()
