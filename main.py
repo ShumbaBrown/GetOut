@@ -1,3 +1,4 @@
+#copy code and run in repl.it if needed
 #keys are the rooms, values are the doors
 rooms = {
                '1' : ['1','2', '3'],
