@@ -3,6 +3,7 @@ import random
 #keys are the rooms, values are the doors
 roomLayout = {}
 gameOver = False
+numLives = 3;
 #initalizes floor plan and selects starting room
 def floorPlan():
     global roomLayout
@@ -22,6 +23,7 @@ def floorPlan():
 #returns the current Room
 def roomManager(currentRoom, doorSelected):
     global gameOver
+    global numLives
     #sets the next room the sum of door and the current room
     nextRoom = int(currentRoom) + int(doorSelected)
     #loops player back to the same room
@@ -34,13 +36,22 @@ def roomManager(currentRoom, doorSelected):
       currentRoom = "Escaped"
       print("You have", currentRoom)
     else:
-        #checks if a door selected leads to a room not in the dictionary
+        #checks if a door selected leads to a room not in the House
+        #and all lives have been reduced
         if(int(nextRoom) > len(roomLayout)):
-          gameOver = True
-          currentRoom = "Sunken Place"
-          print("You have entered in the", currentRoom)
-          nextRoom = 0
-          return currentRoom
+            if(numLives == 0):
+              gameOver = True
+              currentRoom = "Sunken Place"
+              print("You have entered in the", currentRoom)
+              nextRoom = 0
+              return currentRoom
+            else:
+              #deductes life and allows user to repeat the room
+              numLives = numLives - 1
+              currentRoom = int(nextRoom) - int(doorSelected)
+              return currentRoom
+
+
         #sets the next room to the current room
         else:
           currentRoom = nextRoom
@@ -48,8 +59,9 @@ def roomManager(currentRoom, doorSelected):
           return currentRoom
 def main():
     currentRoom = floorPlan()
-    while not gameOver:
+    while (not gameOver and numLives >= 0):
         print("You are in currently in Room ", currentRoom)
+        print("Total Lives:", numLives)
         doorSelected = input("What Door: ")
         currentRoom = roomManager(currentRoom, doorSelected)
 main()
