@@ -1,4 +1,40 @@
 import random
+import unittest
+
+def GenerateNFA(num_states):
+  # Accept the number of states to include in the nfa and returns a dictionary
+  # containing an adjacency list. It also includes indexes current and final.
+  nfa = {}
+
+  for i in range(num_states):
+    transitions = []
+    for j in range(random.randint(1, num_states)):
+      random_num = random.randint(1, num_states)
+      if random_num not in transitions:
+        transitions.append(random_num)
+    nfa[i] = transitions
+
+  nfa["final"] = random.randint(1, num_states - 1)
+  nfa["current"] = 0
+
+  return nfa
+
+def GetDoorChoices(nfa):
+  # Accepts an nfa and returns a list of possible door choices.
+  return nfa[nfa["current"]]
+
+def OpenDoor(nfa, choice):
+  # Accepts an nfa and a door choice and return the nfa after transitioning
+  # to the choice. Returns None if there is an error.
+
+  if choice in nfa:
+    nfa["current"] = choice;
+    return nfa
+  else: 
+    return None
+
+
+
 #copy code and run in repl.it if needed
 #keys are the rooms, values are the doors
 roomLayout = {}
@@ -57,11 +93,39 @@ def roomManager(currentRoom, doorSelected):
           currentRoom = nextRoom
           nextRoom = 0
           return currentRoom
+
+
+
+
+# Tests
+
+class TestStringMethods(unittest.TestCase):
+
+
+    def test_OpenDoor(self):
+        test_nfa = {0: [1, 2, 3], 1: [2, 4], 2: [5], 3: [5], 4: [5], 5: [], "current": 0, "final": 5}
+        expected_nfa = {0: [1, 2, 3], 1: [2, 4], 2: [5], 3: [5], 4: [5], 5: [], "current": 3, "final": 5}
+        self.assertEqual(OpenDoor(test_nfa, 3), expected_nfa)
+
+    def test_GetDoorChoices(self):
+        test_nfa = {0: [1, 2, 3], 1: [2, 4], 2: [5], 3: [5], 4: [5], 5: [], "current": 0, "final": 5}
+        expected_doors = [1, 2, 3]
+        self.assertEqual(GetDoorChoices(test_nfa), expected_doors)
+
+# End of tests.
+
 def main():
+
+    # Uncomment the line below to run unit tests.
+    # unittest.main()
+
     currentRoom = floorPlan()
     while (not gameOver and numLives >= 0):
         print("You are in currently in Room ", currentRoom)
         print("Total Lives:", numLives)
         doorSelected = input("What Door: ")
         currentRoom = roomManager(currentRoom, doorSelected)
+
+
+
 main()
