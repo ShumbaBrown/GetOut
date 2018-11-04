@@ -72,4 +72,5 @@ def main():
         print("Total Lives:", numLives)
         doorSelected = input("What Door: ")
         currentRoom = roomManager(currentRoom, doorSelected)
+
 main()
