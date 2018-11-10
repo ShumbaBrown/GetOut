@@ -5,6 +5,9 @@ roomLayout = {}
 gameOver = False
 numLives = 3
 teleporter = 0
+roomSequence = []
+doorSequence = []
+
 #initalizes floor plan and selects starting room
 def floorPlan():
     global roomLayout
@@ -32,11 +35,14 @@ def floorPlan():
       startingRoom = random.choice(list(roomLayout))
     print('There are', totalRooms, 'rooms in the House. Can you escape?')
     return startingRoom
+
 #returns the current Room
 def roomManager(currentRoom, doorSelected):
     global gameOver
     global numLives
     global roomLayout
+    global roomSequence
+    global doorSequence
     #checks if door selected is within the room
     if((int(doorSelected)) not in roomLayout[currentRoom]):
       print("This door does not exist. Please attempt again")
@@ -52,7 +58,10 @@ def roomManager(currentRoom, doorSelected):
       elif(nextRoom == len(roomLayout)):
         gameOver = True
         currentRoom = "Escaped"
+        print("\n")
         print("You have", currentRoom)
+        displayRoomSequence()
+        displayDoorSequence()
       else:
           #checks if a door selected leads to a room not in the House
           #and all lives have been reduced
@@ -60,8 +69,11 @@ def roomManager(currentRoom, doorSelected):
               if(numLives == 0):
                 gameOver = True
                 currentRoom = "Sunken Place"
+                print("\n")
                 print("You have entered in the", currentRoom)
                 nextRoom = 0
+                displayRoomSequence()
+                displayDoorSequence()
                 return currentRoom
               else:
                 #deductes life
@@ -79,22 +91,44 @@ def roomManager(currentRoom, doorSelected):
             nextRoom = 0
             return currentRoom
 
+#determines if teleporter exists
 def teleporterManager(currentRoom):
-  if(teleporter in roomLayout[currentRoom]):
+  #teleport if epsilon is in the room and room is odd
+  if(teleporter in roomLayout[currentRoom] and currentRoom % 2 != 0):
     return True
   return False
 
+#displays room sequence
+def displayRoomSequence():
+  global roomSequence
+  print("You entered the following rooms:" , str(roomSequence).strip('[]'))
+
+#displays door sequence
+def displayDoorSequence():
+  global doorSequence
+  print("You went through the following doors:" , str(doorSequence).strip('[]'))
+
 def main():
+    global roomSequence
+    global doorSequence
     currentRoom = floorPlan()
     while (not gameOver and numLives >= 0):
         print("You are in currently in Room", currentRoom)
+        roomSequence.append(currentRoom)
         print("The doors are", str(roomLayout[currentRoom]).strip('[]'))
         print("Total Lives:", numLives)
-        print("The Teleporter is", teleporter)
+        #print("The Teleporter is", teleporter)
         transporterExists = teleporterManager(currentRoom)
         if (transporterExists):
+          doorSequence.append(int(teleporter))
           currentRoom = int(currentRoom/2)
+          print("\n")
+          if(currentRoom == 0):
+            currentRoom = int(len(roomLayout)/2)
+            print("\n")
         else:
           doorSelected = input("What Door: ")
+          doorSequence.append(int(doorSelected))
           currentRoom = roomManager(currentRoom, doorSelected)
+          print("\n")
 main()
