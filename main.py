@@ -11,19 +11,23 @@ def floorPlan():
     roomLayout = {roomNum: [] for roomNum in range(1, totalRooms + 1)}
     #populates rooms and doors
     for key in roomLayout:
-        for value in range(totalRooms + 1):
-            roomLayout[key].append(value)
+        for value in range(1, 4):
+            door = random.randint(1, totalRooms)
+            roomLayout[key].append(door)
+            #print(roomLayout[key])
+
     #starts player in random room
     startingRoom = random.choice(list(roomLayout))
     #ensures starting room is not the final room and has at least 4 rooms
     while(startingRoom == len(roomLayout) or int(startingRoom) < 4):
       startingRoom = random.choice(list(roomLayout))
-    print('There are ', totalRooms, 'rooms in the House. Can you escape?')
+    print('There are', totalRooms, 'rooms in the House. Can you escape?')
     return startingRoom
 #returns the current Room
 def roomManager(currentRoom, doorSelected):
     global gameOver
     global numLives
+    global roomLayout
     #checks if door selected is within the house
     if(int(doorSelected) > len(roomLayout)):
       print("This door does not exist. Please attempt again")
@@ -68,7 +72,8 @@ def roomManager(currentRoom, doorSelected):
 def main():
     currentRoom = floorPlan()
     while (not gameOver and numLives >= 0):
-        print("You are in currently in Room ", currentRoom)
+        print("You are in currently in Room", currentRoom)
+        print("The doors are", str(roomLayout[currentRoom]).strip('[]'))
         print("Total Lives:", numLives)
         doorSelected = input("What Door: ")
         currentRoom = roomManager(currentRoom, doorSelected)
