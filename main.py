@@ -3,10 +3,12 @@ import random
 #keys are the rooms, values are the doors
 roomLayout = {}
 gameOver = False
-numLives = 3;
+numLives = 3
+teleporter = 0
 #initalizes floor plan and selects starting room
 def floorPlan():
     global roomLayout
+    global teleporter
     totalRooms = random.randint(1, 10)
     roomLayout = {roomNum: [] for roomNum in range(1, totalRooms + 1)}
     #populates rooms and doors
@@ -18,7 +20,11 @@ def floorPlan():
             if(door not in roomLayout[key]):
               roomLayout[key].append(door)
             #print(roomLayout[key])
-
+    #teleporter implements epsilon (transfer to new room without user input)
+    teleporter = random.randint(1, totalRooms)
+    #ensures user cannot teleport to accept state
+    while(teleporter == len(roomLayout)):
+      teleporter = random.randint(1, totalRooms)
     #starts player in random room
     startingRoom = random.choice(list(roomLayout))
     #ensures starting room is not the final room and has at least 4 rooms
@@ -31,12 +37,12 @@ def roomManager(currentRoom, doorSelected):
     global gameOver
     global numLives
     global roomLayout
-    #checks if door selected is within the house
-    if(int(doorSelected) > len(roomLayout)):
+    #checks if door selected is within the room
+    if((int(doorSelected)) not in roomLayout[currentRoom]):
       print("This door does not exist. Please attempt again")
       return currentRoom
     else:
-        #sets the next room the sum of door and the current room
+      #sets the next room the sum of door and the current room
       nextRoom = int(currentRoom) + int(doorSelected)
       #loops player back to the same room
       if(int(doorSelected) == int(currentRoom)):
@@ -72,13 +78,23 @@ def roomManager(currentRoom, doorSelected):
             currentRoom = nextRoom
             nextRoom = 0
             return currentRoom
+
+def teleporterManager(currentRoom):
+  if(teleporter in roomLayout[currentRoom]):
+    return True
+  return False
+
 def main():
     currentRoom = floorPlan()
     while (not gameOver and numLives >= 0):
         print("You are in currently in Room", currentRoom)
         print("The doors are", str(roomLayout[currentRoom]).strip('[]'))
         print("Total Lives:", numLives)
-        doorSelected = input("What Door: ")
-        currentRoom = roomManager(currentRoom, doorSelected)
-
+        print("The Teleporter is", teleporter)
+        transporterExists = teleporterManager(currentRoom)
+        if (transporterExists):
+          currentRoom = int(currentRoom/2)
+        else:
+          doorSelected = input("What Door: ")
+          currentRoom = roomManager(currentRoom, doorSelected)
 main()
