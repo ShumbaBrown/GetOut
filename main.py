@@ -37,14 +37,14 @@ def floorPlan():
     return startingRoom
 
 #returns the current Room
-def roomManager(currentRoom, doorSelected):
+def roomManager(currentRoom, doorSelected, doorColorInput, doors):
     global gameOver
     global numLives
     global roomLayout
     global roomSequence
     global doorSequence
     #checks if door selected is within the room
-    if((int(doorSelected)) not in roomLayout[currentRoom]):
+    if(doorColorInput not in doors):
       print("This door does not exist. Please attempt again")
       return currentRoom
     else:
@@ -58,18 +58,15 @@ def roomManager(currentRoom, doorSelected):
       elif(nextRoom == len(roomLayout)):
         gameOver = True
         currentRoom = "Escaped"
-        print("\n")
         print("You have", currentRoom)
         displayRoomSequence()
         displayDoorSequence()
       else:
-          #checks if a door selected leads to a room not in the House
-          #and all lives have been reduced
+          #checks if a door selected leads to a room not in the House and all lives have been reduced
           if(int(nextRoom) > len(roomLayout)):
               if(numLives == 0):
                 gameOver = True
                 currentRoom = "Sunken Place"
-                print("\n")
                 print("You have entered in the", currentRoom)
                 nextRoom = 0
                 displayRoomSequence()
@@ -94,7 +91,7 @@ def roomManager(currentRoom, doorSelected):
 #determines if teleporter exists
 def teleporterManager(currentRoom):
   #teleport if epsilon is in the room and room is odd
-  if(teleporter in roomLayout[currentRoom] and currentRoom % 2 != 0):
+  if(teleporter in roomLayout[currentRoom]and currentRoom % 2 != 0):
     return True
   return False
 
@@ -106,29 +103,66 @@ def displayRoomSequence():
 #displays door sequence
 def displayDoorSequence():
   global doorSequence
-  print("You went through the following doors:" , str(doorSequence).strip('[]'))
+  print("You went through the following doors:" , ', '.join(doorSequence))
+
+#maps door to a color based on index
+def mapDoorsToColors(roomLayout,currentRoom):
+  roomColors = []
+  for door in roomLayout[currentRoom]:
+    if (door == roomLayout[currentRoom][0]):
+        door = "red"
+        roomColors.append(door)
+    elif (door == roomLayout[currentRoom][1]):
+        door = "green"
+        roomColors.append(door)
+    else:
+        door = "blue"
+        roomColors.append(door)
+  return roomColors
+
+#maps color back to number
+def ColorstoNumber(doorColorInput, currentRoom):
+  if (doorColorInput == "red"):
+    return roomLayout[currentRoom][0]
+  elif (doorColorInput == "green"):
+    return roomLayout[currentRoom][1]
+  else:
+    return roomLayout[currentRoom][2]
+
+#retrieves teleporter color
+def retrieveTeleporterColor(teleporter, currentRoom):
+  if (teleporter == roomLayout[currentRoom][0]):
+    return "red"
+  elif (teleporter == roomLayout[currentRoom][1]):
+    return "green"
+  else:
+    return "blue"
 
 def main():
     global roomSequence
     global doorSequence
+    doors = []
     currentRoom = floorPlan()
     while (not gameOver and numLives >= 0):
         print("You are in currently in Room", currentRoom)
         roomSequence.append(currentRoom)
-        print("The doors are", str(roomLayout[currentRoom]).strip('[]'))
+        doors = mapDoorsToColors(roomLayout, currentRoom)
+        print("The doors are", ', '.join(doors))
         print("Total Lives:", numLives)
         #print("The Teleporter is", teleporter)
-        transporterExists = teleporterManager(currentRoom)
-        if (transporterExists):
-          doorSequence.append(int(teleporter))
-          currentRoom = int(currentRoom/2)
+        teleporterExists = teleporterManager(currentRoom)
+        if (teleporterExists):
+          teleporterColor = retrieveTeleporterColor(teleporter, currentRoom)
+          print("You are being teleported through the", teleporterColor, "door ")
           print("\n")
+          doorSequence.append(teleporterColor)
+          currentRoom = int(currentRoom/2)
           if(currentRoom == 0):
             currentRoom = int(len(roomLayout)/2)
-            print("\n")
         else:
-          doorSelected = input("What Door: ")
-          doorSequence.append(int(doorSelected))
-          currentRoom = roomManager(currentRoom, doorSelected)
+          doorColorInput = input("What Door: ")
           print("\n")
+          doorSequence.append(doorColorInput)
+          doorSelected = ColorstoNumber(doorColorInput, currentRoom)
+          currentRoom = roomManager(currentRoom, doorSelected, doorColorInput, doors)
 main()
