@@ -11,9 +11,12 @@ def floorPlan():
     roomLayout = {roomNum: [] for roomNum in range(1, totalRooms + 1)}
     #populates rooms and doors
     for key in roomLayout:
-        for value in range(1, 4):
+      #sets the number of doors per room to 3
+        while(len(roomLayout[key]) < 3):
             door = random.randint(1, totalRooms)
-            roomLayout[key].append(door)
+            #makes sure doors are unique
+            if(door not in roomLayout[key]):
+              roomLayout[key].append(door)
             #print(roomLayout[key])
 
     #starts player in random room
