@@ -50,7 +50,9 @@ class Graph:
             # If this adjacent node is the destination node,
             # then return true
             if n == d:
-              # print(*path, sep = ", ")
+              print("A Path to Escape are Rooms:" , end= " ")
+              print(*path, sep = ", ")
+              print("\n")
               return True
 
             #  Else, continue to do BFS
@@ -98,9 +100,8 @@ def floorPlan():
     global roomLayout
     global teleporter
     global totalRooms
-    totalRooms = random.randint(1, 10)
+    totalRooms = random.randint(4, 10)
     roomLayout = {roomNum: [] for roomNum in range(1, totalRooms + 1)}
-
     #populates rooms and doors
     for key in roomLayout:
       #sets the number of doors per room to 3
@@ -112,7 +113,6 @@ def floorPlan():
                 roomLayout[key].append(0)
               else:
                  roomLayout[key].append(door)
-        # print(roomLayout[key])
 
     #teleporter implements epsilon (transfer to new room without user input)
     teleporter = random.randint(1, totalRooms)
@@ -305,8 +305,14 @@ def main():
         escapePathExists = calculateGraph(currentRoom)
       gameOver = False
       numLives = 3
-
+      print("The Floor Plan is: ")
+      for key in roomLayout:
+        print(roomLayout[key])
+      print("\n")
+      print("Each index corresponds to a color. Index 0 is red, 1 is green, and 2 is blue." + "\n")
+      print("The Epsilon Transition is", teleporter, "and is activated when the room is odd" + "\n")
       print('There are', totalRooms, 'rooms in the House. Can you escape? \n')
+      print("*****************************************************" + "\n")
       while (not gameOver and numLives >= 0):
           print("You are in currently in Room", currentRoom)
           roomSequence.append(currentRoom)
@@ -331,5 +337,5 @@ def main():
             currentRoom = checkColorInput(doorColorInput, doors,currentRoom, doorSelected)
 
     print("Game Over")
-    
+
 main()
