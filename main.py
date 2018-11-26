@@ -5,6 +5,7 @@ from collections import defaultdict
 #keys are the rooms, values are the doors
 roomLayout = {}
 gameOver = False
+playGame = True
 numLives = 3
 teleporter = 0
 totalRooms = 0
@@ -263,49 +264,72 @@ def displayManager(doorColorInput, currentRoom):
     roomSequence.append(len(roomLayout))
     displayRoomSequence()
     displayDoorSequence()
+    restartGame()
+
 
   elif(currentRoom == "Sunken Place"):
     print("You have entered in the", currentRoom)
     displayRoomSequence()
     displayDoorSequence()
+    restartGame()
+
+#restarts game
+def restartGame():
+  global playGame
+  playAgain = input("Play Again? (Y/N) : ")
+  if(playAgain == "Y"):
+    print("\n")
+    playGame = True
+  elif (playAgain == "N"):
+    print("\n")
+    playGame = False
+  else:
+    print("Invalid Input. Select Again")
+    restartGame()
 
 def main():
     global roomSequence
     global doorSequence
     global gameOver
     global numLives
+    global playGame
     escapePathExists = False
     doors = []
-
-    while (not escapePathExists):
+    while (playGame):
+      roomSequence = []
+      doorSequence = []
       currentRoom = floorPlan()
       escapePathExists = calculateGraph(currentRoom)
+      while (not escapePathExists):
+        currentRoom = floorPlan()
+        escapePathExists = calculateGraph(currentRoom)
+      gameOver = False
+      numLives = 3
 
-    gameOver = False
-    numLives = 3
+      print('There are', totalRooms, 'rooms in the House. Can you escape? \n')
+      while (not gameOver and numLives >= 0):
+          print("You are in currently in Room", currentRoom)
+          roomSequence.append(currentRoom)
+          doors = mapDoorsToColors(roomLayout, currentRoom)
+          print("The doors are", ', '.join(doors))
+          print("Total Lives:", numLives)
+          # print("The Teleporter is", teleporter)
+          teleporterExists = teleporterManager(currentRoom)
 
-    print('There are', totalRooms, 'rooms in the House. Can you escape? \n')
-    while (not gameOver and numLives >= 0):
-        print("You are in currently in Room", currentRoom)
-        roomSequence.append(currentRoom)
-        doors = mapDoorsToColors(roomLayout, currentRoom)
-        print("The doors are", ', '.join(doors))
-        print("Total Lives:", numLives)
-        # print("The Teleporter is", teleporter)
-        teleporterExists = teleporterManager(currentRoom)
+          if (teleporterExists):
+            teleporterColor = retrieveTeleporterColor(teleporter, currentRoom)
+            print("You are being teleported through the", teleporterColor, "door ")
+            print("\n")
+            doorSequence.append(teleporterColor)
+            currentRoom = teleporterRoomManager(currentRoom)
 
-        if (teleporterExists):
-          teleporterColor = retrieveTeleporterColor(teleporter, currentRoom)
-          print("You are being teleported through the", teleporterColor, "door ")
-          print("\n")
-          doorSequence.append(teleporterColor)
-          currentRoom = teleporterRoomManager(currentRoom)
+          else:
+            doorColorInput = input("What Door: ")
+            print("\n")
+            doorSequence.append(doorColorInput)
+            doorSelected = ColorstoNumber(doorColorInput, currentRoom)
+            currentRoom = checkColorInput(doorColorInput, doors,currentRoom, doorSelected)
 
-        else:
-          doorColorInput = input("What Door: ")
-          print("\n")
-          doorSequence.append(doorColorInput)
-          doorSelected = ColorstoNumber(doorColorInput, currentRoom)
-          currentRoom = checkColorInput(doorColorInput, doors,currentRoom, doorSelected)
-
+    print("Game Over")
+    
 main()
