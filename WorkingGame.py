@@ -8,6 +8,13 @@ from cocos.layer import ColorLayer
 from cocos.sprite import Sprite
 from pyglet.window import key
 
+# Scene Sequence so far:
+#   Intro Scene
+#   FloorPlan 
+#   Room1       Living Room     (Red -> Dining Room,    Green -> BedRoom,       Blue-> itself)
+#   Room2       Dining Room     (Red -> Living Room,    Green -> itself,        Blue-> Bedroom)
+#   Room3       Bedroom         (Red-> itself,          Green -> Dining Room,   Blue-> Living Room)
+
 class IntroSceneLayer(cocos.layer.Layer):
     
     is_event_handler = True
@@ -60,27 +67,20 @@ class LivingRoomScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(LivingRoomScene, self).__init__()
         
-        spr1_layer = Sprite1()#red
-        spr2_layer = Sprite2()#living room 
-        spr4_layer = Sprite4()#yellow
-        spr5_layer = Sprite5()#blue
-        spr6_layer = Sprite6()#pink
-        spr7_layer = Sprite7()#white
-        spr8_layer = Sprite8()#/brown
-        transition_scene = TransitionScene()
+        livingRoom_layer = LivingRoomLayer()
+        redDoor_layer = RedDoorLR()
+        greenDoor_layer = GreenDoorLR()
+        blueDoor_layer = BlueDoorLR()
 
                         
-        self.add(spr1_layer, z = 2)
-        self.add(spr2_layer, z = 0)
-        self.add(spr4_layer, z = 2)
-        self.add(spr5_layer, z = 3)
-        self.add(spr6_layer, z = 3)
-        self.add(spr7_layer, z = 3)
-        self.add(spr8_layer, z = 2)
+        self.add(livingRoom_layer, z = 0)
+        self.add(redDoor_layer, z = 2)
+        self.add(greenDoor_layer, z = 2)
+        self.add(blueDoor_layer, z = 2)
                 
 # Living room scene:
 class LivingRoomLayer(cocos.layer.Layer):
-    is_event_handler = True
+    # is_event_handler = True
     
     def __init__(self):
         super(LivingRoomLayer, self).__init__()
@@ -91,17 +91,15 @@ class LivingRoomLayer(cocos.layer.Layer):
         self.add(LRspr, z = 0)
         
         
-class Sprite1(cocos.layer.Layer):
+class RedDoorLR(cocos.layer.Layer):  # transitions to dining room
     is_event_handler = True
     
     def __init__(self):
-            super(Sprite1, self).__init__()
-
+        
+            super(RedDoorLR, self).__init__()
             spr = cocos.sprite.Sprite("Doors/RedDoor.png")
-
             spr.position = 900 , 260
             spr.scale = 1
-
             self.add(spr, z = 10)
             
             self.spriteHeight = spr.height
@@ -109,8 +107,169 @@ class Sprite1(cocos.layer.Layer):
             self.spriteWidth = spr.width
             print("sprite width: ", self.spriteWidth) #154
             
-            # self.collision_manager = CollisionManager()
-            # self.collision_manager.add(self.spr)
+            
+    def on_mouse_motion (self, x, y, dx, dy):
+        """Called when the mouse moves over the app window with no button pressed
+         (x, y) are the physical coordinates of the mouse
+        (dx, dy) is the distance vector covered by the mouse pointer since the
+          last call.
+        """
+        print(x,y)
+    def on_mouse_press(self, x, y, buttons, modifiers):
+        
+        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
+        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
+        self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
+        if(self.mouseX >= 400 and self.mouseX <= 490 
+            and self.mouseY>=40 and self.mouseY <= 218):
+            # director.replace(Scene(TransitionScene()))
+            director.replace(DiningRoomScene())
+            
+# class TransitionScene(cocos.layer.Layer):
+#     def __init__(self):
+#         super(TransitionScene, self).__init__()
+#         spr1 = cocos.sprite.Sprite("Rooms/Bedroom.png")
+#         spr1.scale = 1
+#         self.position = 640, 400
+#         self.add(spr1)
+        
+class GreenDoorLR(cocos.layer.Layer): # transitions to bedroom 
+    is_event_handler = True
+    
+    def __init__(self):
+            super(GreenDoorLR, self).__init__()
+
+            spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
+
+            spr4.position = 600 , 260
+            spr4.scale = 1
+
+            self.add(spr4, z = 10)
+            
+    def on_mouse_motion (self, x, y, dx, dy):
+        """Called when the mouse moves over the app window with no button pressed
+         (x, y) are the physical coordinates of the mouse
+        (dx, dy) is the distance vector covered by the mouse pointer since the
+          last call.
+        """
+        print(x,y)
+        
+    def on_mouse_press(self, x, y, buttons, modifiers):
+        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
+        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
+        self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
+        
+        if(self.mouseX >= 260 and self.mouseX <= 340 
+            and self.mouseY>=40 and self.mouseY <= 218):
+            # director.replace(Scene(TransitionScene()))
+            director.replace(BedRoomScene())
+
+
+class BlueDoorLR(cocos.layer.Layer): # doesn't do anything. ie, transitions to the same room.
+    def __init__(self):
+            super(BlueDoorLR, self).__init__()
+
+            spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
+
+            spr8.position = 300, 260
+
+            spr8.scale = 1
+
+            self.add(spr8, z = 10)
+            
+            
+# Dining Room Scene
+class DiningRoomScene(cocos.scene.Scene):
+    def __init__(self, *args, **kwargs):
+        super(DiningRoomScene, self).__init__()
+
+        diningRoom_layer = DiningRoomLayer()
+        redDoor_layer = RedDoorDR()
+        greenDoor_layer = GreenDoorDR()
+        blueDoor_layer = BlueDoorDR()
+
+
+        self.add(diningRoom_layer, z = 0)
+        self.add(redDoor_layer, z = 2)
+        self.add(greenDoor_layer, z = 2)
+        self.add(blueDoor_layer, z = 2)
+
+class DiningRoomLayer(cocos.layer.Layer):
+    is_event_handler = True
+
+    def __init__(self):
+        super(DiningRoomLayer, self).__init__()
+
+        spr = cocos.sprite.Sprite("Rooms/DiningRoom.png")
+        spr.scale = 1
+        self.position = 640, 400
+        self.add(spr, z = 0)
+
+
+class RedDoorDR(cocos.layer.Layer): #transitions back to living room
+    is_event_handler = True
+
+    def __init__(self):
+            super(RedDoorDR, self).__init__()
+
+            spr = cocos.sprite.Sprite("Doors/RedDoor.png")
+
+            spr.position = 900 , 260
+            spr.scale = 1
+
+            self.add(spr, z = 10)
+
+            self.spriteHeight = spr.height
+            # print("sprite height: ", self.spriteHeight) #356
+            self.spriteWidth = spr.width
+            # print("sprite width: ", self.spriteWidth) #154
+
+    def on_mouse_motion (self, x, y, dx, dy):
+        """Called when the mouse moves over the app window with no button pressed
+
+        (x, y) are the physical coordinates of the mouse
+        (dx, dy) is the distance vector covered by the mouse pointer since the
+          last call.
+        """
+        print(x,y)
+        self.mouseX = x
+        # print("mouseX: ", self.mouseX)
+        self.mouseY = y
+        # print("mouseY: ", self.mouseY)
+
+    def on_mouse_press(self, x, y, buttons, modifiers):
+        self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
+        if(self.position_x >= 400 and self.position_x <= 490
+            and self.position_y >= 40 and self.position_y <= 218):
+           director.replace(LivingRoomScene()) 
+
+
+
+class GreenDoorDR(cocos.layer.Layer): # transitions to itself. nothing happens on click
+    def __init__(self):
+            super(GreenDoorDR, self).__init__()
+
+            spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
+
+            spr4.position = 600 , 260
+            spr4.scale = 1
+
+            self.add(spr4, z = 10)
+
+
+class BlueDoorDR(cocos.layer.Layer): # transitions to bedroom
+    is_event_handler = True
+    def __init__(self):
+            super(BlueDoorDR, self).__init__()
+
+            spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
+
+            spr8.position = 300, 260
+
+            spr8.scale = 1
+
+            self.add(spr8, z = 10)
+            
             
     def on_mouse_motion (self, x, y, dx, dy):
         """Called when the mouse moves over the app window with no button pressed
@@ -119,210 +278,130 @@ class Sprite1(cocos.layer.Layer):
         (dx, dy) is the distance vector covered by the mouse pointer since the
           last call.
         """
+        print(x,y)
         self.mouseX = x
         # print("mouseX: ", self.mouseX)
         self.mouseY = y
         # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-#         print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
-        if(self.mouseX >= 400 and self.mouseX <= 490 
-            and self.mouseY>=40 and self.mouseY <= 218):
-            director.replace(Scene(TransitionScene()))
-        
-            
-#
-class TransitionScene(cocos.layer.Layer):
+        self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
+        if(self.position_x >= 115 and self.position_x <= 185
+            and self.position_y >= 45 and self.position_y <= 210):
+           director.replace(BedRoomScene())
+           
+           
+# Bedroom scene
+class BedRoomScene(cocos.scene.Scene):
+    def __init__(self, *args, **kwargs):
+        super(BedRoomScene, self).__init__()
+
+        bedRoom_layer = BedRoomLayer()
+        redDoor_layer = RedDoorBR()
+        greenDoor_layer = GreenDoorBR()
+        blueDoor_layer = BlueDoorBR()
+
+
+        self.add(bedRoom_layer, z = 0)
+        self.add(redDoor_layer, z = 2)
+        self.add(greenDoor_layer, z = 2)
+        self.add(blueDoor_layer, z = 2)
+
+class BedRoomLayer(cocos.layer.Layer):
+    is_event_handler = True
+
     def __init__(self):
-        super(TransitionScene, self).__init__()
+        super(BedRoomLayer, self).__init__()
 
-        spr1 = cocos.sprite.Sprite("Rooms/Bedroom.png")
-
-        spr1.scale = 1
+        spr = cocos.sprite.Sprite("Rooms/Bedroom.png")
+        spr.scale = 1
         self.position = 640, 400
+        self.add(spr, z = 0)
 
-        self.add(spr1)
-        
-class Sprite2(cocos.sprite.Sprite):
+
+class RedDoorBR(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
     def __init__(self):
-        super(Sprite2, self).__init__("Rooms/LivingRoom.png")
-        self.position = 640, 400
+            super(RedDoorBR, self).__init__()
+
+            spr = cocos.sprite.Sprite("Doors/RedDoor.png")
+
+            spr.position = 900 , 260
+            spr.scale = 1
+
+            self.add(spr, z = 10)
+
+            self.spriteHeight = spr.height
+            print("sprite height: ", self.spriteHeight) #356
+            self.spriteWidth = spr.width
+            print("sprite width: ", self.spriteWidth) #154
 
 
-class Sprite4(cocos.layer.Layer):
+
+class GreenDoorBR(cocos.layer.Layer): # transitions to dining room
+    is_event_handler = True
     def __init__(self):
-            super(Sprite4, self).__init__()
-
-            spr4 = cocos.sprite.Sprite("Doors/YellowDoor.png")
-
-            spr4.position = 560 , 300
-            spr4.scale = 1
-
-            self.add(spr4, z = 10)
-
-class Sprite5(cocos.layer.Layer):
-    def __init__(self):
-            super(Sprite5, self).__init__()
+            super(GreenDoorBR, self).__init__()
 
             spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
 
-            spr4.position = 150 , 300
-            spr4.scale = 1.5
+            spr4.position = 600 , 260
+            spr4.scale = 1
 
             self.add(spr4, z = 10)
+            
+    def on_mouse_motion (self, x, y, dx, dy):
+        """Called when the mouse moves over the app window with no button pressed
+         (x, y) are the physical coordinates of the mouse
+        (dx, dy) is the distance vector covered by the mouse pointer since the
+          last call.
+        """
+        print(x,y)
+        
+    def on_mouse_press(self, x, y, buttons, modifiers):
+        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
+        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
+        self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
+        
+        if(self.mouseX >= 260 and self.mouseX <= 340 
+            and self.mouseY>=40 and self.mouseY <= 218):
+            # director.replace(Scene(TransitionScene()))
+            director.replace(DiningRoomScene())
 
-class Sprite6(cocos.layer.Layer):
+
+class BlueDoorBR(cocos.layer.Layer): #transitions to living room
+    is_event_handler = True;
     def __init__(self):
-            super(Sprite6, self).__init__()
+            super(BlueDoorBR, self).__init__()
 
-            spr6 = cocos.sprite.Sprite("Doors/PinkDoor.png")
+            spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
 
-            spr6.position = 1135, 300
-            spr6.scale = 1.5
-
-            self.add(spr6, z = 10)
-
-class Sprite7(cocos.layer.Layer):
-    def __init__(self):
-            super(Sprite7, self).__init__()
-
-            spr7 = cocos.sprite.Sprite("Doors/WhiteDoor.png")
-
-            spr7.position = 740, 310
-            spr7.scale = 0.75
-
-            self.add(spr7, z = 10)
-
-class Sprite8(cocos.layer.Layer):
-    def __init__(self):
-            super(Sprite8, self).__init__()
-
-            spr8 = cocos.sprite.Sprite("Doors/BrownDoor.png")
-
-            spr8.position = 380, 260
+            spr8.position = 300, 260
 
             spr8.scale = 1
 
             self.add(spr8, z = 10)
-        
-        # RDspr = cocos.sprite.Sprite("Doors/RedDoor.png")
-  #
-  #       RDspr.position = 900 , 260
-  #       RDspr.scale = 1
-  #
-  #       self.add(RDspr, z = 2)
-  #
-  #       self.RDspriteHeight = RDspr.height
-  #       print("sprite height: ", self.spriteHeight) #356
-  #       self.RDspriteWidth = RDspr.width
-  #       print("sprite width: ", self.spriteWidth) #154
-        
-        # BRspr = cocos.sprite.Sprite("Rooms/Bedroom.png")
-#
-#         BRspr.scale = 1
-#         BRspr.position = 640, 400
-#
-#         self.add(BRspr, z = 2)
-        
+            
     def on_mouse_motion (self, x, y, dx, dy):
         """Called when the mouse moves over the app window with no button pressed
 
-            (x, y) are the physical coordinates of the mouse
-            (dx, dy) is the distance vector covered by the mouse pointer since the
-              last call.
+        (x, y) are the physical coordinates of the mouse
+        (dx, dy) is the distance vector covered by the mouse pointer since the
+          last call.
         """
+        print(x,y)
         self.mouseX = x
         # print("mouseX: ", self.mouseX)
         self.mouseY = y
         # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
-        if(self.mouseX >= 400 and self.mouseX <= 490 
-            and self.mouseY>=40 and self.mouseY <= 218):
-            director.replace(Scene(TransitionScene()))
-        
+        self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
+        if(self.position_x >= 115 and self.position_x <= 185
+            and self.position_y >= 45 and self.position_y <= 210):
+           director.replace(LivingRoomScene())
 
+ 
 
-
-        
-            
-# #
-# class TransitionScene(cocos.layer.Layer):
-#     def __init__(self):
-#         super(TransitionScene, self).__init__()
-#
-#
-#
-# class Sprite4(cocos.layer.Layer):
-#     def __init__(self):
-#             super(Sprite4, self).__init__()
-#
-#             spr4 = cocos.sprite.Sprite("Doors/YellowDoor.png")
-#
-#             spr4.position = 560 , 300
-#             spr4.scale = 1
-#
-#             self.add(spr4, z = 10)
-#
-# class Sprite5(cocos.layer.Layer):
-#     def __init__(self):
-#             super(Sprite5, self).__init__()
-#
-#             spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
-#
-#             spr4.position = 150 , 300
-#             spr4.scale = 1.5
-#
-#             self.add(spr4, z = 10)
-#
-# class Sprite6(cocos.layer.Layer):
-#     def __init__(self):
-#             super(Sprite6, self).__init__()
-#
-#             spr6 = cocos.sprite.Sprite("Doors/PinkDoor.png")
-#
-#             spr6.position = 1135, 300
-#             spr6.scale = 1.5
-#
-#             self.add(spr6, z = 10)
-#
-# class Sprite7(cocos.layer.Layer):
-#     def __init__(self):
-#             super(Sprite7, self).__init__()
-#
-#             spr7 = cocos.sprite.Sprite("Doors/WhiteDoor.png")
-#
-#             spr7.position = 740, 310
-#             spr7.scale = 0.75
-#
-#             self.add(spr7, z = 10)
-#
-# class Sprite8(cocos.layer.Layer):
-#     def __init__(self):
-#             super(Sprite8, self).__init__()
-#
-#             spr8 = cocos.sprite.Sprite("Doors/BrownDoor.png")
-#
-#             spr8.position = 380, 260
-#
-#             spr8.scale = 1
-#
-#             self.add(spr8, z = 10)
-
-# if __name__ == "__main__":
-#                 director.init(width=1280, height = 920, caption="my cocos window")
-#                 director.window.pop_handlers()
-#
-#                 transition_scene = TransitionScene()
-#
-#                 test_scene = cocos.scene.Scene();
-#
-#
-#                 director.run(test_scene)
-#
 if __name__ == "__main__":
                 director.init(width=1280, height = 920, caption="my cocos window")
                 director.window.pop_handlers()
@@ -332,23 +411,5 @@ if __name__ == "__main__":
                 introScene = cocos.scene.Scene()
                 introScene.add(introSceneLayer, z = 0)
                 
-                # livingRoomScene = cocos.scene.Scene()
-#                 livingRoomLayer =LivingRoomLayer()
-#                 spr1_layer = Sprite1()#red
-#                 spr4_layer = Sprite4()#yellow
-#                 spr5_layer = Sprite5()#blue
-#                 spr6_layer = Sprite6()#pink
-#                 spr7_layer = Sprite7()#white
-#                 spr8_layer = Sprite8()#/brown
-#
-#                 livingRoomScene.add(livingRoomLayer, z = 0)
-#                 livingRoomScene.add(spr1_layer, z = 2)
-#                 livingRoomScene.add(spr4_layer, z = 2)
-#                 livingRoomScene.add(spr5_layer, z = 3)
-#                 livingRoomScene.add(spr6_layer, z = 3)
-#                 livingRoomScene.add(spr7_layer, z = 3)
-#                 livingRoomScene.add(spr8_layer, z = 2)
-                
                 director.run(introScene)
-                # director.push(livingRoomScene)
             
