@@ -16,7 +16,7 @@ class IntroSceneLayer(cocos.layer.Layer):
         
         super(IntroSceneLayer, self).__init__()
 
-        spr = cocos.sprite.Sprite("logo.jpeg")
+        spr = cocos.sprite.Sprite("gogo.jpeg")
 
         spr.position = 640 , 400
         spr.scale = 1
@@ -238,7 +238,7 @@ class Sprite8(cocos.layer.Layer):
         # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
+        print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
         # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         if(self.mouseX >= 400 and self.mouseX <= 490 
             and self.mouseY>=40 and self.mouseY <= 218):
