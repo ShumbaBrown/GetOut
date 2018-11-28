@@ -23,7 +23,7 @@ import random
 #   Room4       attic           (Red -> Dining Room,    Green -> BedRoom,       Blue-> itself)
 #   Room5       basement        (Red -> Living Room,    Green -> itself,        Blue-> Bedroom)
 #   Room6       hallway         (Red-> itself,          Green -> Dining Room,   Blue-> Living Room)
-#   Room7       bedroom2        (Red -> Dining Room,    Green -> BedRoom,       Blue-> itself)
+#   Room7       bedroom2        (Red -> Dining Room,    Green -> BedRoom,       Blue-> out)
 
 
 
@@ -781,7 +781,7 @@ class BedLayer(cocos.layer.Layer):
     def __init__(self):
         super(BedLayer, self).__init__()
 
-        spr = cocos.sprite.Sprite("Rooms/hallway.jpg")
+        spr = cocos.sprite.Sprite("Rooms/bedroom.jpg")
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
@@ -865,8 +865,28 @@ class BlueDoorHA(cocos.layer.Layer): #transitions to living room
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
         if(self.position_x >= 115 and self.position_x <= 185
             and self.position_y >= 45 and self.position_y <= 210):
-           director.replace(LivingRoomScene())
+           director.replace(WinningScene())
 
+# Winning scene
+class WinningScene(cocos.scene.Scene):
+    def __init__(self, *args, **kwargs):
+        super(WinningScene, self).__init__()
+
+        basement_layer = WinningLayer()
+
+
+        self.add(basement_layer, z = 0)
+
+class WinningLayer(cocos.layer.Layer):
+    is_event_handler = True
+
+    def __init__(self):
+        super(WinningLayer, self).__init__()
+
+        spr = cocos.sprite.Sprite("Rooms/win.png")
+        spr.scale = 1
+        self.position = 640, 400
+        self.add(spr, z = 0)
 
 
 if __name__ == "__main__":
