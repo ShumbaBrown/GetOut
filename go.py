@@ -106,6 +106,11 @@ class LivingRoomLayer(cocos.layer.Layer):
         LRspr.scale = 1
         self.position = 640, 400
         self.add(LRspr, z = 0)
+
+        introtextLabel = cocos.text.Label("Living Room",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
         
         
 class RedDoorLR(cocos.layer.Layer):  # transitions to dining room
@@ -123,6 +128,7 @@ class RedDoorLR(cocos.layer.Layer):  # transitions to dining room
             print("sprite height: ", self.spriteHeight) #356
             self.spriteWidth = spr.width
             print("sprite width: ", self.spriteWidth) #154
+
             
             
     def on_mouse_motion (self, x, y, dx, dy):
@@ -221,6 +227,11 @@ class DiningRoomLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+
+        introtextLabel = cocos.text.Label("Dining Room", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
 
 
 class RedDoorDR(cocos.layer.Layer): #transitions back to living room
@@ -332,6 +343,11 @@ class BedRoomLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+
+        introtextLabel = cocos.text.Label("Bedroom", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
 
 
 class RedDoorBR(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
@@ -460,6 +476,11 @@ class AtticLayer(cocos.layer.Layer):
         self.position = 640, 400
         self.add(spr, z = 0)
 
+        introtextLabel = cocos.text.Label("The Attic", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
+
 
 class RedDoorAR(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
     def __init__(self):
@@ -569,6 +590,11 @@ class BasementLayer(cocos.layer.Layer):
         self.position = 640, 400
         self.add(spr, z = 0)
 
+        introtextLabel = cocos.text.Label("Basement", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
+
 
 class RedDoorBA(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
     def __init__(self):
@@ -660,7 +686,6 @@ class HallwayScene(cocos.scene.Scene):
         greenDoor_layer = GreenDoorHA()
         blueDoor_layer = BlueDoorHA()
 
-
         self.add(basement_layer, z = 0)
         self.add(redDoor_layer, z = 2)
         self.add(greenDoor_layer, z = 2)
@@ -676,6 +701,11 @@ class HallwayLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+
+        introtextLabel = cocos.text.Label("Hallway", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
 
 
 class RedDoorHA(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
@@ -786,6 +816,11 @@ class BedLayer(cocos.layer.Layer):
         self.position = 640, 400
         self.add(spr, z = 0)
 
+        introtextLabel = cocos.text.Label("Bedroom", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
+
 
 class RedDoorB(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
     def __init__(self):
@@ -887,6 +922,11 @@ class WinningLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+
+        introtextLabel = cocos.text.Label("CONGRATS! DONT COME BACK!!!!", 
+            font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        introtextLabel.position = 100, 426
+        self.add(introtextLabel)
 
 
 if __name__ == "__main__":
