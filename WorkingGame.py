@@ -7,6 +7,7 @@ from cocos.scene import Scene
 from cocos.layer import ColorLayer
 from cocos.sprite import Sprite
 from pyglet.window import key
+import subprocess
 
 # Scene Sequence so far:
 #   Intro Scene
@@ -21,18 +22,13 @@ from pyglet.window import key
 #   Winning Scene
 
 class IntroSceneLayer(cocos.layer.Layer):
-    
     is_event_handler = True
-    space_counter = 1
     def __init__(self):
-        
         super(IntroSceneLayer, self).__init__()
 
         spr = cocos.sprite.Sprite("logo.jpeg")
-
         spr.position = 640 , 400
         spr.scale = 1
-
         self.add(spr, z = 10)
                 
         introtextLabel = cocos.text.Label(
@@ -40,6 +36,10 @@ class IntroSceneLayer(cocos.layer.Layer):
                         anchor_x = "center", anchor_y = "center")
         introtextLabel.position = 620, 60
         self.add(introtextLabel)
+        
+    def on_exit(self):
+            super(IntroSceneLayer, self).on_exit()
+            subprocess.call(["afplay", "audio/intro.mp3"])
                 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.SPACE:
@@ -66,8 +66,12 @@ class FloorPlanLayer(cocos.layer.Layer):
     def on_key_press(self, symbol, modifiers):
         if symbol == key.SPACE:
             print("space was pressed in floor plan")
+            subprocess.call(["afplay", "audio/floorPlan.mp3"])
             director.replace(LivingRoomScene())
             
+#                
+# Living room scene:
+#            
 class LivingRoomScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(LivingRoomScene, self).__init__()
@@ -76,17 +80,13 @@ class LivingRoomScene(cocos.scene.Scene):
         redDoor_layer = RedDoorLR()
         greenDoor_layer = GreenDoorLR()
         blueDoor_layer = BlueDoorLR()
-
                         
         self.add(livingRoom_layer, z = 0)
         self.add(redDoor_layer, z = 2)
         self.add(greenDoor_layer, z = 2)
         self.add(blueDoor_layer, z = 2)
                 
-# Living room scene:
 class LivingRoomLayer(cocos.layer.Layer):
-    # is_event_handler = True
-    
     def __init__(self):
         super(LivingRoomLayer, self).__init__()
         
@@ -94,6 +94,11 @@ class LivingRoomLayer(cocos.layer.Layer):
         LRspr.scale = 1
         self.position = 640, 400
         self.add(LRspr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 1 : Living Room",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
         
         
 class RedDoorLR(cocos.layer.Layer):  # transitions to basement. TELEPORTER
@@ -106,38 +111,13 @@ class RedDoorLR(cocos.layer.Layer):  # transitions to basement. TELEPORTER
             spr.position = 900 , 260
             spr.scale = 1
             self.add(spr, z = 10)
-            
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
-            
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-    def on_mouse_press(self, x, y, buttons, modifiers):
         
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
+    def on_mouse_press(self, x, y, buttons, modifiers):
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         if(self.mouseX >= 400 and self.mouseX <= 490 
             and self.mouseY>=40 and self.mouseY <= 218):
-            # director.replace(Scene(TransitionScene()))
             director.replace(BasementScene())
-            
-# class TransitionScene(cocos.layer.Layer):
-#     def __init__(self):
-#         super(TransitionScene, self).__init__()
-#         spr1 = cocos.sprite.Sprite("Rooms/Bedroom.png")
-#         spr1.scale = 1
-#         self.position = 640, 400
-#         self.add(spr1)
-        
+
 class GreenDoorLR(cocos.layer.Layer): # transitions to dining room 
     is_event_handler = True
     
@@ -151,22 +131,11 @@ class GreenDoorLR(cocos.layer.Layer): # transitions to dining room
 
             self.add(spr4, z = 10)
             
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         
         if(self.mouseX >= 260 and self.mouseX <= 340 
             and self.mouseY>=40 and self.mouseY <= 218):
-            # director.replace(Scene(TransitionScene()))
             director.replace(DiningRoomScene())
 
 
@@ -175,15 +144,13 @@ class BlueDoorLR(cocos.layer.Layer): # doesn't do anything. ie, transitions to t
             super(BlueDoorLR, self).__init__()
 
             spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
-
             spr8.position = 300, 260
-
             spr8.scale = 1
-
             self.add(spr8, z = 10)
             
-            
+#          
 # Dining Room Scene
+#
 class DiningRoomScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(DiningRoomScene, self).__init__()
@@ -193,15 +160,12 @@ class DiningRoomScene(cocos.scene.Scene):
         greenDoor_layer = GreenDoorDR()
         blueDoor_layer = BlueDoorDR()
 
-
         self.add(diningRoom_layer, z = 0)
         self.add(redDoor_layer, z = 2)
         self.add(greenDoor_layer, z = 2)
         self.add(blueDoor_layer, z = 2)
 
 class DiningRoomLayer(cocos.layer.Layer):
-    is_event_handler = True
-
     def __init__(self):
         super(DiningRoomLayer, self).__init__()
 
@@ -209,6 +173,11 @@ class DiningRoomLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 2 : Dining Room",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorDR(cocos.layer.Layer): #transitions back to living room
@@ -221,25 +190,7 @@ class RedDoorDR(cocos.layer.Layer): #transitions back to living room
 
             spr.position = 900 , 260
             spr.scale = 1
-
             self.add(spr, z = 10)
-
-            self.spriteHeight = spr.height
-            # print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            # print("sprite width: ", self.spriteWidth) #154
-
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -247,17 +198,13 @@ class RedDoorDR(cocos.layer.Layer): #transitions back to living room
             and self.position_y >= 40 and self.position_y <= 218):
            director.replace(LivingRoomScene()) 
 
-
-
 class GreenDoorDR(cocos.layer.Layer): # transitions to itself. nothing happens on click
     def __init__(self):
             super(GreenDoorDR, self).__init__()
 
             spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
-
             spr4.position = 600 , 260
             spr4.scale = 1
-
             self.add(spr4, z = 10)
 
 
@@ -273,19 +220,7 @@ class BlueDoorDR(cocos.layer.Layer): # transitions to bedroom
             spr8.scale = 1
 
             self.add(spr8, z = 10)
-            
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
+                    
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -293,8 +228,9 @@ class BlueDoorDR(cocos.layer.Layer): # transitions to bedroom
             and self.position_y >= 45 and self.position_y <= 210):
            director.replace(BedRoomScene())
            
-           
+#           
 # Bedroom scene
+#
 class BedRoomScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(BedRoomScene, self).__init__()
@@ -303,7 +239,6 @@ class BedRoomScene(cocos.scene.Scene):
         redDoor_layer = RedDoorBR()
         greenDoor_layer = GreenDoorBR()
         blueDoor_layer = BlueDoorBR()
-
 
         self.add(bedRoom_layer, z = 0)
         self.add(redDoor_layer, z = 2)
@@ -318,6 +253,11 @@ class BedRoomLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 3 : Bedroom",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorBR(cocos.layer.Layer): #transitions to the attic
@@ -326,28 +266,10 @@ class RedDoorBR(cocos.layer.Layer): #transitions to the attic
             super(RedDoorBR, self).__init__()
 
             spr = cocos.sprite.Sprite("Doors/RedDoor.png")
-
             spr.position = 900 , 260
             spr.scale = 1
-
             self.add(spr, z = 10)
 
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -363,23 +285,12 @@ class GreenDoorBR(cocos.layer.Layer): # transitions to dining room
             super(GreenDoorBR, self).__init__()
 
             spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
-
             spr4.position = 600 , 260
             spr4.scale = 1
-
             self.add(spr4, z = 10)
             
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
         
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         
         if(self.mouseX >= 260 and self.mouseX <= 340 
@@ -393,14 +304,13 @@ class BlueDoorBR(cocos.layer.Layer): #transitions to itself
             super(BlueDoorBR, self).__init__()
 
             spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
-
             spr8.position = 300, 260
-
             spr8.scale = 1
-
             self.add(spr8, z = 10)
 
+#
 # Attic scene
+#
 class AtticScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(AtticScene, self).__init__()
@@ -424,6 +334,11 @@ class AtticLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 4 : Attic",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorAR(cocos.layer.Layer): #transitions to Basement
@@ -437,31 +352,13 @@ class RedDoorAR(cocos.layer.Layer): #transitions to Basement
             spr.scale = 1
 
             self.add(spr, z = 10)
-
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
             
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
         if(self.position_x >= 400 and self.position_x <= 490
             and self.position_y >= 40 and self.position_y <= 218):
            director.replace(BasementScene())
-
-
 
 class GreenDoorAR(cocos.layer.Layer): # transitions to bedroom scene
     is_event_handler = True
@@ -475,22 +372,12 @@ class GreenDoorAR(cocos.layer.Layer): # transitions to bedroom scene
 
             self.add(spr4, z = 10)
             
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
         
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         
         if(self.mouseX >= 260 and self.mouseX <= 340 
             and self.mouseY>=40 and self.mouseY <= 218):
-            # director.replace(Scene(TransitionScene()))
             director.replace(BedRoomScene())
 
 
@@ -499,15 +386,13 @@ class BlueDoorAR(cocos.layer.Layer): #transitions to itself
             super(BlueDoorAR, self).__init__()
 
             spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
-
             spr8.position = 300, 260
-
             spr8.scale = 1
-
             self.add(spr8, z = 10)
 
-
+#
 # Basement scene
+#
 class BasementScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(BasementScene, self).__init__()
@@ -516,7 +401,6 @@ class BasementScene(cocos.scene.Scene):
         redDoor_layer = RedDoorBA()
         greenDoor_layer = GreenDoorBA()
         blueDoor_layer = BlueDoorBA()
-
 
         self.add(basement_layer, z = 0)
         self.add(redDoor_layer, z = 2)
@@ -531,6 +415,11 @@ class BasementLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 5 : Basement",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorBA(cocos.layer.Layer): #transitions to BedRoom2. TELEPORTER
@@ -539,28 +428,9 @@ class RedDoorBA(cocos.layer.Layer): #transitions to BedRoom2. TELEPORTER
             super(RedDoorBA, self).__init__()
 
             spr = cocos.sprite.Sprite("Doors/RedDoor.png")
-
             spr.position = 900 , 260
             spr.scale = 1
-
             self.add(spr, z = 10)
-
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -575,10 +445,8 @@ class GreenDoorBA(cocos.layer.Layer): # transitions to itself
             super(GreenDoorBA, self).__init__()
 
             spr4 = cocos.sprite.Sprite("Doors/GreenDoor.png")
-
             spr4.position = 600 , 260
             spr4.scale = 1
-
             self.add(spr4, z = 10)
 
 
@@ -588,24 +456,10 @@ class BlueDoorBA(cocos.layer.Layer): #transitions to the hallway
             super(BlueDoorBA, self).__init__()
 
             spr8 = cocos.sprite.Sprite("Doors/BlueDoor.png")
-
             spr8.position = 300, 260
-
             spr8.scale = 1
-
             self.add(spr8, z = 10)
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
+  
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -613,7 +467,9 @@ class BlueDoorBA(cocos.layer.Layer): #transitions to the hallway
             and self.position_y >= 45 and self.position_y <= 210):
            director.replace(HallwayScene())
 
+#
 # Hallway scene
+#
 class HallwayScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(HallwayScene, self).__init__()
@@ -622,7 +478,6 @@ class HallwayScene(cocos.scene.Scene):
         redDoor_layer = RedDoorHA()
         greenDoor_layer = GreenDoorHA()
         blueDoor_layer = BlueDoorHA()
-
 
         self.add(hallway_layer, z = 0)
         self.add(redDoor_layer, z = 2)
@@ -637,6 +492,11 @@ class HallwayLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 6 : Hallway",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorHA(cocos.layer.Layer): #transitions to itself. Nothing happens onClick
@@ -650,13 +510,6 @@ class RedDoorHA(cocos.layer.Layer): #transitions to itself. Nothing happens onCl
 
             self.add(spr, z = 10)
 
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
-
-
-
 class GreenDoorHA(cocos.layer.Layer): # transitions to Bedroom2
     is_event_handler = True
     def __init__(self):
@@ -668,18 +521,9 @@ class GreenDoorHA(cocos.layer.Layer): # transitions to Bedroom2
             spr4.scale = 1
 
             self.add(spr4, z = 10)
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
+           
         
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         
         if(self.mouseX >= 260 and self.mouseX <= 340 
@@ -700,18 +544,6 @@ class BlueDoorHA(cocos.layer.Layer): #transitions to Attic
             spr8.scale = 1
 
             self.add(spr8, z = 10)
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -719,8 +551,9 @@ class BlueDoorHA(cocos.layer.Layer): #transitions to Attic
             and self.position_y >= 45 and self.position_y <= 210):
            director.replace(AtticScene())
 
-
+#
 # Bedroom 2 scene
+#
 class BedRoom2Scene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(BedRoom2Scene, self).__init__()
@@ -729,7 +562,6 @@ class BedRoom2Scene(cocos.scene.Scene):
         redDoor_layer = RedDoorB()
         greenDoor_layer = GreenDoorB()
         blueDoor_layer = BlueDoorB()
-
 
         self.add(basement_layer, z = 0)
         self.add(redDoor_layer, z = 2)
@@ -744,6 +576,11 @@ class BedRoom2Layer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("Room 7 : Bedroom2",
+              font_name= 'Times New Roman', font_size=72, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 50, 426
+        self.add(textLabel)
 
 
 class RedDoorB(cocos.layer.Layer): #transitions to Winning Scene
@@ -758,30 +595,11 @@ class RedDoorB(cocos.layer.Layer): #transitions to Winning Scene
 
             self.add(spr, z = 10)
 
-            self.spriteHeight = spr.height
-            print("sprite height: ", self.spriteHeight) #356
-            self.spriteWidth = spr.width
-            print("sprite width: ", self.spriteWidth) #154
-            
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
-
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
         if(self.position_x >= 400 and self.position_x <= 490
             and self.position_y >= 40 and self.position_y <= 218):
            director.replace(WinningScene())
-
 
 
 class GreenDoorB(cocos.layer.Layer): # transitions to basement 
@@ -795,23 +613,12 @@ class GreenDoorB(cocos.layer.Layer): # transitions to basement
             spr4.scale = 1
 
             self.add(spr4, z = 10)
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-         (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
         
     def on_mouse_press(self, x, y, buttons, modifiers):
-        # print("self.mouseX + self.spriteWidth: ", self.mouseX + self.spriteWidth)
-        # print("self.mouseY + self.spriteHeight: ", self.mouseY + self.spriteHeight)
         self.mouseX,self.mouseY = director.get_virtual_coordinates(x, y)
         
         if(self.mouseX >= 260 and self.mouseX <= 340 
             and self.mouseY>=40 and self.mouseY <= 218):
-            # director.replace(Scene(TransitionScene()))
             director.replace(BasementScene())
 
 
@@ -827,18 +634,6 @@ class BlueDoorB(cocos.layer.Layer): #transitions to living room
             spr8.scale = 1
 
             self.add(spr8, z = 10)
-            
-    def on_mouse_motion (self, x, y, dx, dy):
-        """Called when the mouse moves over the app window with no button pressed
-        (x, y) are the physical coordinates of the mouse
-        (dx, dy) is the distance vector covered by the mouse pointer since the
-          last call.
-        """
-        print(x,y)
-        self.mouseX = x
-        # print("mouseX: ", self.mouseX)
-        self.mouseY = y
-        # print("mouseY: ", self.mouseY)
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         self.position_x, self.position_y = director.get_virtual_coordinates(x, y)
@@ -846,8 +641,9 @@ class BlueDoorB(cocos.layer.Layer): #transitions to living room
             and self.position_y >= 45 and self.position_y <= 210):
            director.replace(LivingRoomScene())
            
-           
+#          
 # Winning scene
+#
 class WinningScene(cocos.scene.Scene):
     def __init__(self, *args, **kwargs):
         super(WinningScene, self).__init__()
@@ -864,6 +660,11 @@ class WinningLayer(cocos.layer.Layer):
         spr.scale = 1
         self.position = 640, 400
         self.add(spr, z = 0)
+        
+        textLabel = cocos.text.Label("CONGRATS! YOU HAVE ESCAPED. DONT COME BACK!!!!",
+              font_name= 'Times New Roman', font_size=32, anchor_x = "center", anchor_y = "center")
+        textLabel.position = 40, 100
+        self.add(textLabel)
            
 
 if __name__ == "__main__":
